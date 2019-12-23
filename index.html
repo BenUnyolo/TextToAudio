@@ -10,25 +10,27 @@
 </head>
 
 <body>
-    <div id="box">
+    <div class="box">
         <h1>Text to Audio</h1>
-        <select name="languageOption" id="language"></select>
-        <textarea name="text" id="text">Hello. My name is Benjamin.</textarea>
-        <button id="convert">Convert</button>
-        <span class="spacer"></span>
+        <div id="inputBox">
+            <select name="languageOption" id="language"></select>
+            <textarea name="text" id="text">Hello. My name is Benjamin.</textarea>
+            <button id="convert" class="mainButton">Convert</button>
+        </div>
 
-        <div id="files">
+        <div id="filesBox">
             <!-- Files Here -->
         </div>
 
         <!-- <div class="newDiv">
             <p class="audioText">Test Div. Lorem Ipsum.</p>
             <audio src="" controls=""></audio>
-            <a href="blob:null/7c020aa0-ffc3-4ca9-b301-fc7196cbaa37" download="audio.mp3"><button>Download</button></a>
+            <a href="blob:null/7c020aa0-ffc3-4ca9-b301-fc7196cbaa37" download="audio.mp3"><button class="download">Download</button></a>
         </div> -->
     </div>
 </body>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.0/jszip.min.js"></script>
 <script src="script.js"></script>
 
 </html>
