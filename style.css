@@ -1,32 +1,54 @@
+:root {
+    --bg-color: #93C08D;
+    --text-color: #052628;
+    --title-color: #32936F;
+    --highlight-color: #D6F2D2; 
+}
+
 html * {
     font-family: Helvetica, Arial, sans-serif;
     font-size: 16px;
     box-sizing: border-box;
 }
 
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
 h1 {
+    font-family: 'Berkshire Swash', cursive;
     text-align: center;
-    font-size: 3rem;
-    margin: 10px 0 20px 0;
+    font-size: 4rem;
+    margin: 5px 0 10px 0;
+    color: var(--title-color);
+}
+
+p {
+    margin: 0;
+    font-size: 1.25em;
+    text-align: center;
 }
 
 hr {
-    border: 1px solid green;
-    border-radius: 1px;
+    border: 2px solid var(--highlight-color);
+    border-radius: 2px;
+    margin: 15px 0;
 }
 
 .box {
+    background: #ffffff;
     margin: auto;
     width: 30rem;
-    padding: 10px;
-    box-shadow:0 0 10px rgba(0, 0, 0, 0.5);
+    padding: 10px 15px 20px 15px;
+    box-shadow:0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: 1rem;
 }
 
 .box select, .box textarea, .mainButton {
     width: 100%;
     display: block;
-    margin: 10px 0;
+    margin: 0 0 15px 0;
     padding: 10px;
 }
 
@@ -52,6 +74,14 @@ button:active {
 	top:1px;
 }
 
+#convert {
+    margin: 0;
+}
+
+#downloadZipButton {
+    margin: 15px 0 0 0;
+}
+
 a {
     text-decoration: none;
 }
@@ -65,7 +95,7 @@ a {
 .audioText {
     text-align: center;
     font-size: 1.2em;
-    margin: 5px 0;
+    margin: 0 0 5px 0;
 
 }
 
@@ -76,10 +106,8 @@ a {
 }
 
 .newDiv {
-    margin: 10px 0px;
-    padding: 5px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-    border: 1px solid green;
+    /* margin: 10px 0px; */
+    padding: 0;
 }
 
 audio {

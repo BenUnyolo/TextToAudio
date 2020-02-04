@@ -10,6 +10,7 @@ const languages = [
     ];
 let choice = languages[0];
 const audioFiles = [];
+const maxFiles = 15;
 const zip = new JSZip();
 const folder = zip.folder('texttoaudio-files');
 
@@ -22,6 +23,7 @@ const textElement = document.querySelector("#text");
 
 let text = textElement.value;
 let dividedText = [];
+console.log(dividedText.length);
 
 // populate languages in dropdown
 (() => {
@@ -38,15 +40,61 @@ function divideText() {
     dividedText = dividedText.filter(item => item != '');
     console.log(dividedText);
     // returns false if too long
-    if (dividedText.length > 55) {
-        console.log("too many files");
+    if (dividedText.length > maxFiles) {
+        alert(`The maximum number of audio files you can generate is ${maxFiles}`);
+        return false;
+    } else if (dividedText.length == 0) {
+        alert(`Enter the text you would like to convert`);
         return false;
     } else {
-    return dividedText;
+        return dividedText;
     }
 }
 
-function requestAudio(phrase) {
+function convertText() {
+    // returns if too many phrases
+    if (divideText() === false) {
+        return;
+    }
+
+    inputBox.innerHTML = "<p>Loading...</p>";
+
+    let promises = [];
+
+    dividedText.forEach((phrase, index) => {
+        promises.push(requestAudio(phrase, index));
+    });
+
+
+    Promise.all(promises)
+        .then(() => {
+            // sorts files back in order
+            audioFiles.sort((a, b) => a.order - b.order);
+            // adds file to document
+            audioFiles.forEach((file, index) => {
+                addAudioUnit(file);
+                // adds hr inbetween audio files
+                if (index < audioFiles.length - 1){
+                    const hrTag = document.createElement("hr");
+                    filesBox.appendChild(hrTag);
+                }
+            })
+        })
+        .then(() => zip.generateAsync({type: 'blob'}))
+        .then(blob => {
+            // add zip download link
+            const downloadZip = document.createElement("a");
+            downloadZip.href = URL.createObjectURL(blob);
+            downloadZip.download = "texttoaudio-files.zip";
+            downloadZip.innerHTML = "<button class='mainButton' id='downloadZipButton'>Download Zip</button>";
+            box.appendChild(downloadZip);
+            // remove initial elements
+            inputBox.style.display = "none";
+        })
+        
+}
+
+function requestAudio(phrase, index) {
     return new Promise((resolve, reject) => {    
         const xhr = new XMLHttpRequest();
 
@@ -65,6 +113,7 @@ function requestAudio(phrase) {
             }
 
             let audioTemp = {
+                order: index,
                 text: phrase,
                 abvText: phrase.substring(0, 25),
                 blob: this.response,
@@ -72,8 +121,7 @@ function requestAudio(phrase) {
                 language: { name: choice.name, code: choice.code }
             };
             audioFiles.push(audioTemp);
-            addAudioUnit(audioTemp);
-            resolve(audioTemp);
+            resolve();
         }
 
         xhr.send(null);
@@ -82,77 +130,23 @@ function requestAudio(phrase) {
     });
 };
 
-function convertText() {
-    if (divideText() === false) {
-        return;
-        // probs add some HTML in here
-    }
+function addAudioUnit(file) {
+    // pack audio into folder
+    folder.file(`${file.abvText}.mp3`, file.blob);
 
-    console.log(dividedText);
-
-    let promises = [];
-
-    dividedText.forEach(phrase => {
-        promises.push(requestAudio(phrase));
-    });
-
-
-    Promise.all(promises)
-        .then(() => zip.generateAsync({type: 'blob'}))
-        .then(blob => {
-            // add zip download link
-            const downloadZip = document.createElement("a");
-            downloadZip.href = URL.createObjectURL(blob);
-            downloadZip.download = "texttoaudio-files.zip";
-            downloadZip.innerHTML = "<button class='mainButton'>Download Zip</button>";
-            box.appendChild(downloadZip);
-            // remove initial elements
-            inputBox.style.display = "none";
-         })
-
-}
-
-function addAudioUnit(audioTemp) {
     const newDiv = document.createElement("div");
     newDiv.classList.add("newDiv");
 
     newDiv.innerHTML = `
-    <p class="audioText">${audioTemp.text}</p>
-    <p class="audioLang">${audioTemp.language.name}</p>
-    <audio src="${audioTemp.blobURL}" controls=""></audio>
-    <a href="${audioTemp.blobURL}" download="${audioTemp.abvText}.mp3">
+    <p class="audioText">${file.text}</p>
+    <p class="audioLang">${file.language.name}</p>
+    <audio src="${file.blobURL}" controls=""></audio>
+    <a href="${file.blobURL}" download="${file.abvText}.mp3">
         <button class="download">Download</button>
     </a>
-    <hr>
     `;
-
-    const divider = document.createElement("hr");
-    newDiv.insertBefore(divider, newDiv.nextSibling);
-
-    // const downloadLink = document.createElement("a");
-    // downloadLink.href = audioTemp.blobURL;
-    // downloadLink.download = `${audioTemp.abvText}.mp3`;
-    // downloadLink.innerHTML = "<button class='download'>Download</button>";
-    // newDiv.appendChild(downloadLink);
-
-    // folder.file(`${audioTemp.abvText}.mp3`, audioTemp.blob);
-    
-    // const audioPlay = document.createElement("audio");
-    // audioPlay.src = audioTemp.blobURL;
-    // audioPlay.controls = true;
-    // newDiv.insertBefore(audioPlay, downloadLink);
-
-    // const audioText = document.createElement("p");
-    // audioText.innerHTML = `${audioTemp.text}`;
-    // audioText.classList.add("audioText");
-    // newDiv.insertBefore(audioText, audioPlay);
-
-    // const audioLang = document.createElement("p");
-    // audioLang.innerHTML = `${audioTemp.language.name}`;
-    // audioLang.classList.add("audioLang");
-    // newDiv.insertBefore(audioLang, audioText.nextSibling);
-
     filesBox.appendChild(newDiv);
+
 }
 
 function setLanguage() {
