@@ -23,7 +23,9 @@ const textElement = document.querySelector("#text");
 
 let text = textElement.value;
 let dividedText = [];
-console.log(dividedText.length);
+let requestsCompleted = 0;
+let totalPhrases = 0;
+let percentageComplete = 0;
 
 // populate languages in dropdown
 (() => {
@@ -34,14 +36,12 @@ console.log(dividedText.length);
 
 function divideText() {
     // split array by semi colons and remove empty items
-    console.log(text);
     dividedText = text.split(";");
     dividedText = dividedText.map(item => item.trim());
     dividedText = dividedText.filter(item => item != '');
-    console.log(dividedText);
     // returns false if too long
     if (dividedText.length > maxFiles) {
-        alert(`The maximum number of audio files you can generate is ${maxFiles}`);
+        alert(`The maximum number of audio files you can generate at once is ${maxFiles}`);
         return false;
     } else if (dividedText.length == 0) {
         alert(`Enter the text you would like to convert`);
@@ -58,6 +58,8 @@ function convertText() {
     }
 
     inputBox.innerHTML = "<p>Loading...</p>";
+
+    totalPhrases = dividedText.length;
 
     let promises = [];
 
@@ -100,7 +102,7 @@ function requestAudio(phrase, index) {
 
         xhr.responseType = 'blob';
 
-        xhr.open('GET', `https://cors-anywhere.herokuapp.com/https://code.responsivevoice.org/getvoice.php?t="${encodeURIComponent(phrase)}"&tl=${choice.code}`);
+        xhr.open('GET', `https://cors-anywhere.herokuapp.com/https://code.responsivevoice.org/getvoice.php?key=RCs92IdK&t="${encodeURIComponent(phrase)}"&tl=${choice.code}`);
 
         xhr.onreadystatechange = function () {
             if (xhr.readyState !== XMLHttpRequest.DONE){
@@ -108,7 +110,7 @@ function requestAudio(phrase, index) {
             }
 
             if (xhr.status !== 200){
-                console.log = this.statusText;
+                inputBox.innerHTML = "<p>There was an error requesting the audio, please try again</p>";
                 reject();
             }
 
